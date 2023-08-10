@@ -1,0 +1,30 @@
+helm install --name redis --namespace backend -f redis-values.yaml stable/redis
+
+
+** Please be patient while the chart is being deployed **
+Redis can be accessed via port 6379 on the following DNS names from within your cluster:
+
+redis-master.pixlops.svc.cluster.local for read/write operations
+redis-slave.pixlops.svc.cluster.local for read-only operations
+
+
+To get your password run:
+
+    export REDIS_PASSWORD=$(kubectl get secret --namespace pixlops redis -o jsonpath="{.data.redis-password}" | base64 --decode)
+
+To connect to your Redis server:
+
+1. Run a Redis pod that you can use as a client:
+
+   kubectl run --namespace pixlops redis-client --rm --tty -i --restart='Never' \
+    --env REDIS_PASSWORD=$REDIS_PASSWORD \--labels="redis-client=true" \
+   --image docker.io/bitnami/redis:5.0.5-debian-9-r141 -- bash
+
+2. Connect using the Redis CLI:
+   redis-cli -h redis-master -a $REDIS_PASSWORD
+   redis-cli -h redis-slave -a $REDIS_PASSWORD
+
+
+Note: Since NetworkPolicy is enabled, only pods with label
+redis-client=true"
+will be able to connect to redis.

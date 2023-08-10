@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: pmodel-exporter-service-replica-ctrl
+  namespace: ai-platform
+  labels:
+    app: pmodel-exporter-service-replica-ctrl
+
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: pmodel-exporter-service-pod
+
+    spec:
+      nodeName: jumping-bull
+      volumes:
+        - name: default-token-ppdnp
+          secret:
+            secretName: default-token-ppdnp
+            defaultMode: 420
+      containers:
+      - name: pmodel-exporter-service-container
+        image: registry.pixlops.com/pxlbrain/pmodel-exporter:0.0.22
+        imagePullPolicy: Always
+        env:
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: aws-cred
+                key: access_key
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: aws-cred
+                key: secret_key
+          - name: MODEL_METRICS_PROXY_HOST
+            value: "http://model-metrics-service.jx-production.pixlops.com:80"
+          - name: REDIS_HOST
+            value: redis-master.backend.svc.cluster.local
+          - name: REDIS_PORT
+            value: "6379"
+          - name: REDIS_DB
+            value: "1"
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: redis
+                key: redis-password
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "4.0"
+          limits:
+            memory: "8Gi"
+            cpu: "4.0"
+        ports:
+        - containerPort: 9010
+        volumeMounts:
+          - name: default-token-ppdnp
+            readOnly: true
+            mountPath: /var/run/secrets/kuberntes.io/serviceaccount
+      imagePullSecrets:
+        - name: regcred

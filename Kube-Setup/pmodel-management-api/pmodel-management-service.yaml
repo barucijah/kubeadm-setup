@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pmodel-management-api-service
+  namespace: ai-platform
+  labels:
+    app: pmodel-management-api-service
+spec:
+  ports:
+    - NodePort: 32500
+      port: 80
+      targetPort: 8080
+      protocol: TCP
+  type: ClusterIP
+  selector:
+    app: pmodel-management-api-pod

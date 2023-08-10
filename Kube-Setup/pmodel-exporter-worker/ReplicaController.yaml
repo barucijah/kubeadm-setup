@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: pexport-worker-service-replica-ctrl
+  namespace: ai-platform
+  labels:
+    app: pexporter-worker-service-replica-ctrl
+
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: pexporter-worker-service-pod
+
+    spec:
+      volumes:
+      - name: default-token-ppdnp
+        secret:
+          secretName: default-token-ppdnp
+          defaultMode: 420
+      containers:
+      - name: pexporter-worker-service-container
+        image: registry.pixlops.com/pxlbrain/pexporter-worker:0.0.12
+        imagePullPolicy: Always
+        env:
+          - name: NUMBER_OF_WORKERS
+            value: "8"
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: aws-cred
+                key: access_key
+          - name: "AWS_SECRET_ACCESS_KEY"
+            valueFrom:
+              secretKeyRef:
+                name: aws-cred
+                key: secret_key
+          - name: "AWS_REGION_NAME"
+            valueFrom:
+              secretKeyRef:
+                name: aws-cred
+                key: region_name
+          - name: MODEL_METRICS_PROXY_HOST
+            value: "http://model-metrics-service.jx-production.pixlops.com:80"
+          - name: REDIS_HOST
+            value: redis-master.backend.svc.cluster.local
+          - name: REDIS_PORT
+            value: "6379"
+          - name: REDIS_DB
+            value: "1"
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: redis
+                key: redis-password
+        resources:
+          requests:
+            memory: "16Gi"
+            cpu: "8.0"
+            nvidia.com/gpu: 1
+          limits:
+            memory: "24Gi"
+            cpu: "16.0"
+            nvidia.com/gpu: 1
+        ports:
+        - containerPort: 9010
+        volumeMounts:
+          - name: default-token-ppdnp
+            readOnly: true
+            mountPath: /var/run/secrets/kuberntes.io/serviceaccount
+      imagePullSecrets:
+        - name: regcred

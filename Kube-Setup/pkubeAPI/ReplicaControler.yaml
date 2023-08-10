@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: pkube-api-replica-ctrl
+  namespace: ai-platform
+  labels:
+    app: pkube-api-replica-ctrl
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: pkube-api-pod
+    spec:
+      containers:
+      - name: pkube-api-container
+        image: registry.pixlops.com/pxlbrain/pkube-api:0.0.51
+        imagePullPolicy: Always
+        env:
+          - name: PKUBE_CONFIG_TYPE
+            value: "external"
+          - name: IS_TEST
+            value: "false"
+          - name: PKUBE_URL
+            value: "https://kubernetes.default.svc.cluster.local"
+          - name: PKUBE_TOKEN
+            value: "eyJhbGciOiJSUzI1NiIsImtpZCI6InRLMEZBUDVzN2g0Rm5LMmVILXl5c2xWeTBjUWRhSjBubnpUN0haZjg0a1UifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi11c2VyLXRva2VuLTJjdzlrIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImFkbWluLXVzZXIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiIxNjlmY2M4YS1iODNhLTRhZmUtYmJlNC03NTNjN2E2ZjgzNDYiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06YWRtaW4tdXNlciJ9.t-A5lNEFNNR7HS-P75iT0CKwLIcB5vuOhdLWmVpozgXTDGSbWAhmGHZFiCTXiavKUCyXZ0vdO41yLMLAOkw33NGLX5pbBu7v5cXJUpC6QYFh7aYKVOoz21UheoAgPpXb762Vwq1CVZAJzxja31114-v_qGWwU0D4ZyWC2k8RVV8TPGUcSrpa4mUvabpNg1eVB_vgZzhHBqNLM_Ccz1jTEhdrgvMvkN1UAVHul7rDCnS78SOeLdCepHYNNxBvr08XQ-xge0uBsWiauy6SVf6s6F-1JqskHALpXMOY8_qHKCO8GWromhp3Sv43WDP1Ee8fi7f3KGx6CTZ5c8DcSJHVZA"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "2"
+          limits:
+            memory: "128Mi"
+            cpu: "2"
+        ports:
+        - containerPort: 8080
+      imagePullSecrets:
+        - name: regcred

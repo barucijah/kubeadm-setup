@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Secret
+metadata:
+   name: aws-cred
+   namespace: ai-platform
+type: Opaque
+stringData:
+    access_key: "AKIA2GR2IPXWUKBEVX6D"
+    secret_key: "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"
+    region_name: "eu-west-1"

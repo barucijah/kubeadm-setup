@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: pmodel-management-api-replica-ctrl
+  namespace: ai-platform
+  labels:
+    app: pmodel-management-api-replica-ctrl
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: pmodel-management-api-pod
+    spec:
+      nodeName: jumping-bull
+      containers:
+      - name: pmodel-management-api-container
+        image: registry.pixlops.com/pxlbrain/pmodel-management-api:0.0.73
+        volumeMounts:
+        - name: docker-container
+          mountPath: /var/run
+        - name: docker-cli
+          mountPath: /usr/bin/docker
+        - name: docker-conf
+          mountPath: /root/.docker/config.json
+        - name: tmp-dir
+          mountPath: /tmp
+        securityContext:
+          privileged: true
+        imagePullPolicy: Always
+        env:
+          - name: REST_PORT
+            value: "8080"
+          - name: PKUBE_API_URL
+            value: "http://pkube-api-service.ai-platform.svc.cluster.local:8080/"
+          - name: DEFAULT_IMAGE_REGISTRY_DOMAIN
+            value: "ae214879df03b11e99dae068a9111881-1776316829.eu-west-1.elb.amazonaws.com:5000"
+          - name: DEFAULT_IMAGE_PULL_SECRETS
+            value: "regcred"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "8.0"
+          limits:
+            memory: "1024Mi"
+            cpu: "16.0"
+        ports:
+        - containerPort: 8080
+      volumes:
+      - name: docker-container
+        hostPath:
+          path: /var/run
+          type: Directory
+      - name: docker-cli
+        hostPath:
+           path: /usr/bin/docker
+           type: File
+      - name: docker-conf
+        hostPath:
+           path: /home/bull/.docker/config.json
+      - name: tmp-dir
+        hostPath:
+           path: /tmp
+      imagePullSecrets:
+        - name: regcred

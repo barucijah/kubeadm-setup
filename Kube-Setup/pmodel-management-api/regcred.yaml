@@ -1,0 +1,13 @@
+kind: Secret
+apiVersion: v1
+metadata:
+  name: regcred
+  namespace: ai-platform
+  selfLink: /api/v1/namespaces/ai-platform/secrets/regcred
+  uid: ad14ecd7-70ea-11ea-a564-02d944480aca
+  resourceVersion: '74773'
+  creationTimestamp: '2020-03-28T11:53:01Z'
+data:
+  .dockerconfigjson: >-
+    eyJhdXRocyI6eyJyZWdpc3RyeS5waXhsb3BzLmNvbSI6eyJ1c2VybmFtZSI6InVzZXIiLCJwYXNzd29yZCI6IlFJMjdDN1kzWEZTMTIzYWEiLCJlbWFpbCI6ImRhdm9yLnN0YW5rb3ZpY0BwaXhsYnJhaW4uYWkiLCJhdXRoIjoiZFhObGNqcFJTVEkzUXpkWk0xaEdVekV5TTJGaCJ9fX0=
+type: kubernetes.io/dockerconfigjson
